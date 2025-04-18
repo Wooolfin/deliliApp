@@ -1,0 +1,7 @@
+{
+  "name": "deliliApp",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
