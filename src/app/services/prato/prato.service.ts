@@ -20,4 +20,7 @@ export class PratoService {
     return this.http.post<Prato>(`${this.apiUrl}/add_prato`, newPrato);
   }
 
+  updatePrato(prato: Prato): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/update_prato/${prato.id}`, prato);
+  }  
 }
