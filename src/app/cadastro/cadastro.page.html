@@ -1,0 +1,24 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Cadastro de Pratos</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-list>
+    <ion-item *ngFor="let prato of pratos">
+      <ion-label>
+        <h2>{{ prato.nome }}</h2>
+        <p>{{ prato.descricao }}</p>
+        <h3>{{ prato.valor | currency }}</h3>
+      </ion-label>
+
+    </ion-item>
+  </ion-list>
+</ion-content>
+
+<ion-fab vertical="bottom" horizontal="end" slot="fixed">
+  <ion-fab-button (click)="openModal()" class="fab-button">
+    <ion-icon name="add"></ion-icon>
+  </ion-fab-button>
+</ion-fab>

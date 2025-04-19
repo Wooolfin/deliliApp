@@ -1,0 +1,33 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Cadastro de Prato</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">Fechar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form (ngSubmit)="addPrato()">
+    <ion-item>
+      <ion-label position="floating">Nome</ion-label>
+      <ion-input [(ngModel)]="nome" name="nome" type="text" required></ion-input>
+    </ion-item>
+  
+    <ion-item>
+      <ion-label position="floating">Descrição</ion-label>
+      <ion-textarea [(ngModel)]="descricao" name="descricao" rows="3" required></ion-textarea>
+    </ion-item>
+  
+    <ion-item>
+      <ion-label position="floating">Valor</ion-label>
+      <ion-input [(ngModel)]="valor" name="valor" type="number" required></ion-input>
+    </ion-item>
+  
+    <ion-footer class="ion-padding">
+      <ion-button expand="block" type="submit" color="primary">Salvar</ion-button>
+      <ion-button expand="block" fill="clear" (click)="dismiss()">Cancelar</ion-button>
+    </ion-footer>
+  </form>
+  
+</ion-content>
