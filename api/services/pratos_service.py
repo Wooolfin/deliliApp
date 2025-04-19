@@ -19,6 +19,17 @@ def add_prato(nome: str, descricao: str, valor: float):
     conn.close()
     return {"message": "Prato adicionado com sucesso"}
 
+def update_prato(id: int, nome: str, descricao: str, valor: float):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "UPDATE pratos SET nome = %s, descricao = %s, valor = %s WHERE id = %s",
+        (nome, descricao, valor, id)
+    )
+    conn.commit()
+    conn.close()
+    return {"message": "Prato atualizado com sucesso"}
+
 def delete_prato(id: int):
     conn = get_connection()
     cursor = conn.cursor()
@@ -26,3 +37,4 @@ def delete_prato(id: int):
     conn.commit()
     conn.close()
     return {"message": "Prato deletado com sucesso"}
+
