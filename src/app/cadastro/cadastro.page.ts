@@ -46,6 +46,17 @@ export class CadastroPage implements OnInit {
     });
   }
 
+  deletePrato(id: number) {
+    this.pratoService.deletePrato(id).subscribe({
+      next: () => {
+        this.getPratos();
+      },
+      error: (err) => {
+        console.error('Erro ao deletar prato:', err);
+      },
+    });
+  }
+
   async openModal() {
     const modal = await this.modalController.create({
       component: CadastroModalPage
@@ -106,4 +117,26 @@ export class CadastroPage implements OnInit {
   
     await alert.present();
   }  
+
+  async openDeleteAlert(prato: Prato) {
+    const alert = await this.alertController.create({
+      header: 'Confirmar exclusão',
+      message: `Deseja realmente deletar o prato ${prato.nome}?`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+        },
+        {
+          text: 'Deletar',
+          role: 'destructive',
+          handler: () => {
+            this.deletePrato(prato.id);
+          },
+        },
+      ],
+    });
+  
+    await alert.present();
+  }
 }
