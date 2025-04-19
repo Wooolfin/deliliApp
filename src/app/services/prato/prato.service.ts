@@ -22,5 +22,9 @@ export class PratoService {
 
   updatePrato(prato: Prato): Observable<void> {
     return this.http.put<void>(`${this.apiUrl}/update_prato/${prato.id}`, prato);
-  }  
+  } 
+  
+  deletePrato(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/delete_prato/${id}`);
+  }
 }
