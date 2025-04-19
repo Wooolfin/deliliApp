@@ -12,7 +12,9 @@
         <p>{{ prato.descricao }}</p>
         <h3>{{ prato.valor | currency }}</h3>
       </ion-label>
-
+      <ion-button (click)="openEditAlert(prato)">
+        <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
+      </ion-button>
     </ion-item>
   </ion-list>
 </ion-content>
