@@ -2,10 +2,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes import todo_routes
 from routes import pratos_routes
+from routes import pedido_routes
+from routes import sacola_routes
 
 app = FastAPI()
 
-app.include_router(pratos_routes.router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -15,4 +16,12 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
+app.include_router(pedido_routes.router)
+
 app.include_router(todo_routes.router)
+
+app.include_router(pratos_routes.router)
+
+app.include_router(sacola_routes.router)
+
+
