@@ -7,6 +7,8 @@ router = APIRouter()
 
 class Request_addPedido(BaseModel):
     cliente: str
+    telefone: str
+    endereco: str
 
 @router.get("/get_pedidos")
 def list_pedidos():
