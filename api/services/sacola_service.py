@@ -3,7 +3,7 @@ from database import get_connection
 def get_sacolas():
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT s.pedido_id,p.nome AS nome_prato,s.quantidade,s.subtotal FROM sacola s JOIN pratos p ON s.produto_id = p.id;")
+    cursor.execute("SELECT s.pedido_id,p.nome AS nome_produto,s.quantidade,s.subtotal FROM sacola s JOIN produto p ON s.produto_id = p.id;")
     sacolas = cursor.fetchall()
     conn.close()
     return sacolas
