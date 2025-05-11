@@ -5,7 +5,8 @@ from typing import List
 
 router = APIRouter()
 
-class SacolaRequest(BaseModel):
+class ItemSacola(BaseModel):
+    pedido_id: int
     produto_id: int
     quantidade: int
 
@@ -14,6 +15,6 @@ def list_sacolas():
     return get_sacolas()
 
 @router.post("/add_sacola")
-def inserir_sacola(itens: List[SacolaRequest]):
+def inserir_sacola(itens: List[ItemSacola]):
     itens_dict = [item.dict() for item in itens]
     return add_sacola(itens_dict)

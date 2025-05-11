@@ -1,0 +1,36 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Classificações</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <ion-list>
+    <ion-item *ngFor="let classificacao of classificacoes" (click)="getTamanhos(classificacao.id_classificacao)">
+      <ion-label>
+        <h2>{{ classificacao.nome_classificacao }}</h2>
+        <p *ngIf="classificacao.usa_tamanho">Possui tamanhos</p>
+        <p *ngIf="!classificacao.usa_tamanho">Preço fixo</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <ion-card *ngIf="tamanhos.length > 0">
+    <ion-card-header>
+      <ion-card-title>Tamanhos e Preços</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <ion-list>
+        <ion-item *ngFor="let tamanho of tamanhos">
+          <ion-label>
+            <h3>{{ tamanho.descricao_tamanho }}</h3>
+            <p>R$ {{ tamanho.preco | number:'1.2-2' }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>

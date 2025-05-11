@@ -1,21 +1,64 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Tasks</ion-title>
+    <ion-title>Cardápio</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-item>
-    <ion-input placeholder="New Task" [(ngModel)]="newTask"></ion-input>
-    <ion-button (click)="addTask()">Add</ion-button>
-  </ion-item>  
-
   <ion-list>
-    <ion-item *ngFor="let task of tasks">
-      {{ task.task }}
-      <ion-button fill="clear" color="danger" (click)="deleteTask(task.id)">
-        Delete
-      </ion-button>
+    <ion-item *ngFor="let prato of pratos" (click)="abrirQuantidade(prato)">
+      <ion-label>
+        <h2>{{ prato.nome }}</h2>
+        <p>{{ prato.descricao }}</p>
+        <h3>{{ prato.valor }}</h3>
+      </ion-label>
     </ion-item>
   </ion-list>
+
+  <ion-fab vertical="bottom" horizontal="center" slot="fixed">
+    <ion-fab-button (click)="abrirSacola()" class="finalizar-btn">
+      Finalizar Pedido
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>
+
+<ion-modal [isOpen]="modalAberto" (didDismiss)="modalAberto = false">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Sacola</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="modalAberto = false">Fechar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding">
+      <ion-list>
+        <ion-item *ngFor="let item of itensSacola; let i = index">
+          <ion-label>
+            <h2>{{ item.nome }}</h2>
+            <p>Quantidade: {{ item.quantidade }}</p>
+            <p>Subtotal: {{ item.valor * item.quantidade}}</p>
+          </ion-label>
+          <ion-buttons slot="end">
+            <ion-button (click)="editarItem(i)">
+              <ion-icon name="pencil-outline"></ion-icon>
+            </ion-button>
+            <ion-button color="danger" (click)="removerItem(i)">
+              <ion-icon name="trash-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-item>
+      </ion-list>
+      <ion-item lines="full">
+        <ion-label><strong>Total:</strong></ion-label>
+        <ion-note slot="end">{{ calcularTotal() }}</ion-note>
+      </ion-item>
+
+      <ion-button expand="block" color="success" (click)="finalizarPedido()">
+        Confirmar Pedido
+      </ion-button>      
+    </ion-content>
+  </ng-template>
+</ion-modal>
