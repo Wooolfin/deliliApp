@@ -7,7 +7,7 @@
 <ion-content class="ion-padding">
 
   <ion-list>
-    <ion-item *ngFor="let classificacao of classificacoes" (click)="getTamanhos(classificacao.id_classificacao)">
+    <ion-item *ngFor="let classificacao of classificacoes" (click)="selecionarClassificacao(classificacao)">
       <ion-label>
         <h2>{{ classificacao.nome_classificacao }}</h2>
         <p *ngIf="classificacao.usa_tamanho">Possui tamanhos</p>
@@ -16,8 +16,8 @@
     </ion-item>
   </ion-list>
 
-  <ion-card *ngIf="tamanhos.length > 0">
-    <ion-card-header>
+  <ion-card *ngIf="classificacaoSelecionada?.usa_tamanho">
+    <ion-card-header *ngIf="tamanhos.length > 0">
       <ion-card-title>Tamanhos e Preços</ion-card-title>
     </ion-card-header>
 
@@ -26,11 +26,44 @@
         <ion-item *ngFor="let tamanho of tamanhos">
           <ion-label>
             <h3>{{ tamanho.descricao_tamanho }}</h3>
-            <p>R$ {{ tamanho.preco | number:'1.2-2' }}</p>
           </ion-label>
+          <div class="preco-wrapper">
+            <span class="prefixo">R$</span>
+            <ion-input class="input-preco" type="text" maxlength="6" [(ngModel)]="tamanho.precoEditavel"
+              inputmode="decimal" pattern="^\d{1,3}(,\d{0,2})?$" placeholder="00,00"></ion-input>
+          </div>
         </ion-item>
       </ion-list>
+      <div class="ion-padding ion-text-end">
+        <ion-button color="primary" (click)="salvarPrecos()">Salvar</ion-button>
+      </div>
     </ion-card-content>
   </ion-card>
+
+  <ion-card *ngIf="classificacaoSelecionada && !classificacaoSelecionada.usa_tamanho">
+    <ion-card-header>
+      <ion-card-title>Produtos e Preços</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <ion-list>
+        <ion-item *ngFor="let produto of produtos">
+          <ion-label>
+            <h3>{{ produto.nome_produto }}</h3>
+          </ion-label>
+          <div class="preco-wrapper">
+            <span class="prefixo">R$</span>
+            <ion-input class="input-preco" type="text" maxlength="6" [(ngModel)]="produto.precoEditavel"
+              inputmode="decimal" pattern="^\d{1,3}(,\d{0,2})?$" placeholder="00,00">
+            </ion-input>
+          </div>
+        </ion-item>
+      </ion-list>
+      <div class="ion-padding ion-text-end">
+        <ion-button color="primary" (click)="salvarPrecos()">Salvar</ion-button>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
 
 </ion-content>
