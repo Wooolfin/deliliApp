@@ -1,11 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, ModalController } from '@ionic/angular';
-import { PratoService } from '../services/prato/prato.service';
-import { Prato } from '../services/prato/prato.model';
+import { IonicModule, ModalController, AlertController } from '@ionic/angular';
+import { ProdutoService } from '../services/produto/produto.service';
+import { Produto, Classificacao, Tamanho } from '../services/produto/produto.model';
 import { CadastroModalPage } from '../cadastro/cadastro-modal.page';
-import { AlertController } from '@ionic/angular';
+
+interface ClassificacaoView {
+  id: number;
+  nome: string;
+}
 
 @Component({
   selector: 'app-cadastro',
@@ -20,108 +24,140 @@ import { AlertController } from '@ionic/angular';
 })
 export class CadastroPage implements OnInit {
 
-  pratos: Prato[] = [];
+  produtos: Produto[] = [];
+  produtosFiltrados: Produto[] = [];
+  classificacoes: ClassificacaoView[] = [];
+  classificacaoSelecionada: string | null = null;
 
   constructor(
-    private pratoService: PratoService,
+    private produtoService: ProdutoService,
     private modalController: ModalController,
     private alertController: AlertController
- 
-  ) {}
+  ) { }
 
   ngOnInit() {
-    this.getPratos();
+    this.getProdutos();
+    this.getClassificacoes();
   }
 
-  getPratos() {
-    this.pratoService.getPratos().subscribe((data: Prato[]) => {
-      console.log('Dados recebidos do backend:', data);
-      this.pratos = data;
+  getProdutos() {
+    this.produtoService.getProdutos().subscribe((data: Produto[]) => {
+      this.produtos = data;
+
+      this.produtos
+        .filter(p => p.usa_tamanho)
+        .forEach(p =>
+          this.produtoService.getTamanhos(p.id_produto)
+            .subscribe((tamanhos: Tamanho[]) => {
+              p.tamanhos = tamanhos;
+              p.selectedTamanho = tamanhos[0] || null;
+            })
+        );
+
+      this.produtos
+        .filter(p => !p.usa_tamanho)
+        .forEach(p =>
+          this.produtoService.getTamanhos(p.id_produto)
+            .subscribe((tamanhos: Tamanho[]) => {
+              if (tamanhos.length > 0) {
+                p.preco = tamanhos[0].preco;
+              }
+            })
+        );
+
+      this.filtrarProdutos();
     });
   }
 
-  updatePrato(prato: Prato) {
-    this.pratoService.updatePrato(prato).subscribe(() => {
-      this.getPratos();
+  getClassificacoes() {
+    this.produtoService.getClassificacoes().subscribe((data: Classificacao[]) => {
+      console.log('Classificações:', data);
+      this.classificacoes = data.map(item => ({
+        id: item.id,
+        nome: item.nome_classificacao
+      }));
     });
   }
 
-  deletePrato(id: number) {
-    this.pratoService.deletePrato(id).subscribe({
-      next: () => {
-        this.getPratos();
-      },
-      error: (err) => {
-        console.error('Erro ao deletar prato:', err);
-      },
-    });
+  selecionarClassificacao(nomeClassificacao: string) {
+    if (this.classificacaoSelecionada === nomeClassificacao) {
+      this.classificacaoSelecionada = null;
+    } else {
+      this.classificacaoSelecionada = nomeClassificacao;
+    }
+    this.filtrarProdutos();
+  }
+
+  filtrarProdutos() {
+    if (this.classificacaoSelecionada) {
+      this.produtosFiltrados = this.produtos.filter(p => p.nome_classificacao === this.classificacaoSelecionada);
+    } else {
+      this.produtosFiltrados = this.produtos;
+    }
+  }
+
+  onTamanhoChange(produto: Produto) {
+    console.log('Tamanho selecionado para', produto.id_produto, produto.selectedTamanho);
   }
 
   async openModal() {
     const modal = await this.modalController.create({
       component: CadastroModalPage
     });
-  
+
     modal.onDidDismiss().then((dataReturned) => {
       if (dataReturned.data) {
-        console.log('Novo prato retornado:', dataReturned.data);
-        this.getPratos();
+        this.getProdutos();
       }
     });
-  
+
     return await modal.present();
   }
 
-  async openEditAlert(prato: Prato) {
-    const alert = await this.alertController.create({
-      header: 'Editar Prato',
-      inputs: [
-        {
-          name: 'nome',
-          type: 'text',
-          placeholder: 'Nome',
-          value: prato.nome,
-        },
-        {
-          name: 'descricao',
-          type: 'text',
-          placeholder: 'Descrição',
-          value: prato.descricao,
-        },
-        {
-          name: 'valor',
-          type: 'number',
-          placeholder: 'Valor',
-          value: prato.valor,
-        },
-      ],
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-        },
-        {
-          text: 'Salvar',
-          handler: (data) => {
-            const pratoAtualizado: Prato = {
-              id: prato.id,
-              nome: data.nome,
-              descricao: data.descricao,
-              valor: parseFloat(data.valor),
-            };
-            this.updatePrato(pratoAtualizado);
-          },
-        },
-      ],
-    });
-  
-    await alert.present();
-  }  
+  // async openEditAlert(produto: Produto) {
+  //   const alert = await this.alertController.create({
+  //     header: 'Editar Produto',
+  //     inputs: [
+  //       {
+  //         name: 'nome_produto',
+  //         type: 'text',
+  //         placeholder: 'Nome do Produto',
+  //         value: produto.nome_produto,
+  //       }
+  //     ],
+  //     buttons: [
+  //       {
+  //         text: 'Cancelar',
+  //         role: 'cancel',
+  //       },
+  //       {
+  //         text: 'Salvar',
+  //         handler: (data) => {
+  //           const produtoAtualizado: Produto = {
+  //             id_produto: produto.id_produto,
+  //             nome_produto: data.nome_produto,
+  //             nome_classificacao: produto.nome_classificacao,
+  //             preco: produto.preco
+  //           };
+  //           this.updateProduto(produtoAtualizado);
+  //         },
+  //       },
+  //     ],
+  //   });
 
-  async openDeleteAlert(prato: Prato) {
+  //   await alert.present();
+  // }
+
+  updateProduto(produto: Produto) {
+    this.produtoService.updateProduto(produto).subscribe(() => {
+      this.getProdutos();
+    });
+  }
+
+  async openDeleteAlert(produto: Produto) {
     const alert = await this.alertController.create({
       header: 'Confirmar exclusão',
-      message: `Deseja realmente deletar o prato ${prato.nome}?`,
+      message: `Deseja realmente deletar o produto ${produto.nome_produto}?`,
       buttons: [
         {
           text: 'Cancelar',
@@ -131,12 +167,18 @@ export class CadastroPage implements OnInit {
           text: 'Deletar',
           role: 'destructive',
           handler: () => {
-            this.deletePrato(prato.id);
+            this.deleteProduto(produto.id_produto);
           },
         },
       ],
     });
-  
+
     await alert.present();
+  }
+
+  deleteProduto(id_produto: number) {
+    this.produtoService.deleteProduto(id_produto).subscribe(() => {
+      this.getProdutos();
+    });
   }
 }
