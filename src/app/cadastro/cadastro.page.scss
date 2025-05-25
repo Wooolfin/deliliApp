@@ -1,7 +1,32 @@
-ion-fab {
-    z-index: 100; 
+.filter-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 10px;
+  padding: 10px;
+  justify-content: center;
 }
-  
-.fab-button {
-    margin: 24px;
+
+ion-icon {
+  font-size: 2.5em;
+}
+
+.product-card {
+  position: relative; 
+}
+
+.header-with-actions {
+  position: relative;
+  padding-right: 3rem; 
+}
+
+.action-icons {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  gap: 0.25rem;
+}
+
+.size-line {
+  margin: 0.25rem 0;
 }

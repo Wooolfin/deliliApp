@@ -1,25 +1,66 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Cadastro de Pratos</ion-title>
+    <ion-title>Cadastro de Produtos</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <ion-list>
-    <ion-item *ngFor="let prato of pratos">
+<ion-content>
+
+  <div class="filter-scroll">
+    <ion-chip *ngFor="let classificacao of classificacoes"
+      [color]="classificacaoSelecionada === classificacao.nome ? 'primary' : 'medium'"
+      (click)="selecionarClassificacao(classificacao.nome)">
       <ion-label>
-        <h2>{{ prato.nome }}</h2>
-        <p>{{ prato.descricao }}</p>
-        <h3>{{ prato.valor | currency }}</h3>
+        <ion-icon *ngIf="classificacao.id == 1" name="restaurant-outline"></ion-icon>
+        <ion-icon *ngIf="classificacao.id == 2" name="color-fill-outline"></ion-icon>
+        <ion-icon *ngIf="classificacao.id == 3" name="beer-outline"></ion-icon>
       </ion-label>
-      <ion-button (click)="openEditAlert(prato)">
-        <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
-      </ion-button>
-      <ion-button (click)="openDeleteAlert(prato)">
-        <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-      </ion-button>
-    </ion-item>
-  </ion-list>
+    </ion-chip>
+  </div>
+
+
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12" size-md="6" size-lg="4" *ngFor="let produto of produtosFiltrados">
+        <ion-grid>
+          <ion-row>
+            <ion-col>
+              <ion-card class="product-card">
+                <ion-card-header class="header-with-actions">
+                  <ion-card-title>{{ produto.nome_produto }}</ion-card-title>
+                  <ion-card-subtitle class="ion-text-capitalize">
+                    {{ produto.nome_classificacao }}
+                  </ion-card-subtitle>
+
+                  <div class="action-icons">
+                    <ion-button fill="solid" size="small" color="warning">
+                      <ion-icon slot="icon-only" name="pencil"></ion-icon>
+                    </ion-button>
+                    <ion-button fill="solid" size="small" color="danger">
+                      <ion-icon slot="icon-only" name="close"></ion-icon>
+                    </ion-button>
+                  </div>
+                </ion-card-header>
+
+                <ion-card-content>
+                  <ng-container *ngIf="!produto.usa_tamanho; else comTamanhos">
+                    <strong>R$ {{ produto.preco | number:'1.2-2' }}</strong>
+                  </ng-container>
+
+                  <ng-template #comTamanhos>
+                    <ng-container *ngFor="let t of produto.tamanhos" class="size-line">
+                      <strong>{{ t.descricao_tamanho }} : R$ {{ t.preco | number:'1.2-2' }}</strong>
+                    </ng-container>
+                  </ng-template>
+                </ion-card-content>
+              </ion-card>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
 </ion-content>
 
 <ion-fab vertical="bottom" horizontal="end" slot="fixed">
