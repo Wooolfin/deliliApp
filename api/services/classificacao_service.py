@@ -13,18 +13,18 @@ def get_tamanho(id_classificacao: int):
     cursor = conn.cursor(dictionary=True)
 
     cursor.execute("""
-        SELECT 
+        SELECT
             t.id_tamanho,
             t.descricao_tamanho,
-            pp.preco
-        FROM 
-            produto_preco pp
-        JOIN 
-            tamanho t ON pp.id_tamanho = t.id_tamanho
-        JOIN 
-            produto p ON pp.id_produto = p.id_produto
-        WHERE 
-            p.id_classificacao = %s
+            cp.preco
+        FROM
+            classificacao_preco cp
+        JOIN tamanho t
+            ON cp.id_tamanho = t.id_tamanho
+        WHERE
+            cp.id_classificacao = %s
+        ORDER BY
+            t.id_tamanho;
     """, (id_classificacao,))
 
     tamanhos = cursor.fetchall()
@@ -61,10 +61,10 @@ def update_preco_tamanho(id_classificacao: int, precos_tamanhos: list):
         novo_preco = item['preco']
 
         cursor.execute("""
-            UPDATE produto_preco pp
-            JOIN produto p ON pp.id_produto = p.id_produto
-            SET pp.preco = %s
-            WHERE p.id_classificacao = %s AND pp.id_tamanho = %s
+            UPDATE classificacao_preco cp
+            JOIN produto p ON cp.id_classificacao = p.id_classificacao
+            SET cp.preco = %s
+            WHERE p.id_classificacao = %s AND cp.id_tamanho = %s;
         """, (novo_preco, id_classificacao, id_tamanho))
 
     conn.commit()
@@ -82,10 +82,12 @@ def update_preco_produto(id_classificacao: int, precos_produtos: list):
         novo_preco = item['preco']
 
         cursor.execute("""
-            UPDATE produto_preco pp
-            JOIN produto p ON pp.id_produto = p.id_produto
+            UPDATE produto_preco AS pp
+            JOIN produto AS p
+            ON pp.id_produto = p.id_produto
             SET pp.preco = %s
-            WHERE p.id_classificacao = %s AND pp.id_produto = %s AND pp.id_tamanho IS NULL
+            WHERE p.id_classificacao = %s
+            AND pp.id_produto       = %s;
         """, (novo_preco, id_classificacao, id_produto))
 
     conn.commit()
