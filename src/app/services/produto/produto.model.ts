@@ -17,17 +17,24 @@ export interface Produto {
 }
 
 export interface Classificacao {
+  id_classificacao: number;
   id: number;
   nome_classificacao: string;
   usa_tamanho: boolean;
 }
 
 export interface ProdutoRequest {
+  id_produto: number;
   nome_produto: string;
   descricao: string | null;
-  id_classificacao: number;
+  id_classificacao?: number;
   usa_tamanho: boolean;
-  preco?: number;             
-  precos?: Tamanho[];
+  preco?: number;
 }
 
+export interface UpdateRequest {
+  id_produto: number;
+  nome_produto: string;
+  descricao: string | null;
+  usa_tamanho: boolean;
+}
