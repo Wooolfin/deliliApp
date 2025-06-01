@@ -14,15 +14,18 @@ from services.produtos_service import (
 router = APIRouter()
 
 class ProdutoRequest(BaseModel):
-    nome_produto: str = Field(..., example="Marmita Fit")
+    id_produto: int
+    nome_produto: str
     descricao: Optional[str] = Field(None, example="Opção de marmita saudável")
-    id_classificacao: int = Field(..., example=2)
-    usa_tamanho: bool = Field(..., example=True)
-    preco: Optional[float] = Field(
-        None,
-        example=25.50,
-        description="Obrigatório quando usa_tamanho=False"
-    )
+    id_classificacao: int
+    usa_tamanho: bool
+    preco: Optional[float] = Field(None, example=25.50, description="Obrigatório quando usa_tamanho=False")
+
+class UpdateRequest(BaseModel):
+    nome_produto: str
+    descricao: Optional[str] = Field(None, example="Opção de marmita saudável")
+    usa_tamanho: bool
+    classificacao: Optional[int] = Field(None, description="ID da classificação do produto")
 
 @router.get("/get_produtos")
 def list_produtos():
@@ -38,11 +41,12 @@ def obter_tamanhos(id_produto: int = Path(..., gt=0)):
 
 @router.post("/add_produto")
 def create_produto(produto: ProdutoRequest):
-    if not produto.usa_tamanho and produto.preco is None:
-        raise HTTPException(
-            status_code=400,
-            detail="Para usa_tamanho=False, o campo 'preco' é obrigatório."
-        )
+    if produto.usa_tamanho:
+        if produto.preco:
+            raise HTTPException(status_code=400, detail="Preços para tamanhos não são obrigatórios quando 'usa_tamanho' é True")
+    else:
+        if produto.preco is None:
+            raise HTTPException(status_code=400, detail="Preço é obrigatório quando 'usa_tamanho' é False")
 
     return add_produto(
         nome_produto=produto.nome_produto,
@@ -53,24 +57,18 @@ def create_produto(produto: ProdutoRequest):
     )
 
 @router.put("/update_produto/{id_produto}")
-def edit_produto(
-    id_produto: int = Path(..., gt=0),
-    produto: ProdutoRequest = ...,
-):
-    if not produto.usa_tamanho and produto.preco is None:
-        raise HTTPException(
-            status_code=400,
-            detail="Para usa_tamanho=False, o campo 'preco' é obrigatório."
-        )
-
+def edit_produto(id_produto: int, produto: UpdateRequest):
+    if not produto.usa_tamanho and produto.descricao is not None:
+        raise HTTPException(status_code=400, detail="Para usa_tamanho=False, 'descricao' deve ser None.")
+    
     return update_produto(
         id_produto=id_produto,
         nome_produto=produto.nome_produto,
-        descricao=produto.descricao,
-        id_classificacao=produto.id_classificacao,
+        descricao=produto.descricao,  
         usa_tamanho=produto.usa_tamanho,
-        preco=produto.preco,
     )
+
+
 
 @router.delete("/delete_produto/{id_produto}")
 def remove_produto(id_produto: int = Path(..., gt=0)):

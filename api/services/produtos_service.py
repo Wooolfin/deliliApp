@@ -107,9 +107,7 @@ def update_produto(
     id_produto: int,
     nome_produto: str,
     descricao: Optional[str],
-    id_classificacao: int,
     usa_tamanho: bool,
-    preco: Optional[float] = None
 ):
     conn = get_connection()
     cursor = conn.cursor()
@@ -118,29 +116,22 @@ def update_produto(
     cursor.execute(
         """
         UPDATE produto
-           SET nome_produto    = %s,
-               descricao       = %s,
-               id_classificacao= %s
-         WHERE id_produto      = %s
+        SET nome_produto = %s,
+            descricao = %s
+        WHERE id_produto = %s
         """,
-        (nome_produto, desc_db, id_classificacao, id_produto)
+        (nome_produto, desc_db, id_produto)
     )
 
     if not usa_tamanho:
-        if preco is None:
-            raise HTTPException(
-                status_code=400,
-                detail="Para usa_tamanho=False, o campo 'preco' é obrigatório."
-            )
         cursor.execute(
-            "UPDATE produto_preco SET preco = %s WHERE id_produto = %s",
-            (preco, id_produto)
+            """
+            UPDATE produto
+            SET nome_produto = %s
+            WHERE id_produto = %s
+            """,
+            (nome_produto, id_produto)
         )
-        if cursor.rowcount == 0:
-            cursor.execute(
-                "INSERT INTO produto_preco (id_produto, preco) VALUES (%s, %s)",
-                (id_produto, preco)
-            )
 
     conn.commit()
     conn.close()
