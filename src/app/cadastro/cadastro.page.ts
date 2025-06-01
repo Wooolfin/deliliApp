@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, ModalController, AlertController } from '@ionic/angular';
 import { ProdutoService } from '../services/produto/produto.service';
-import { Produto, Classificacao, Tamanho } from '../services/produto/produto.model';
+import { Produto, Classificacao, Tamanho, ProdutoRequest, UpdateRequest } from '../services/produto/produto.model';
 import { CadastroModalPage } from '../cadastro/cadastro-modal.page';
 
 interface ClassificacaoView {
@@ -114,43 +114,67 @@ export class CadastroPage implements OnInit {
     return await modal.present();
   }
 
-  // async openEditAlert(produto: Produto) {
-  //   const alert = await this.alertController.create({
-  //     header: 'Editar Produto',
-  //     inputs: [
-  //       {
-  //         name: 'nome_produto',
-  //         type: 'text',
-  //         placeholder: 'Nome do Produto',
-  //         value: produto.nome_produto,
-  //       }
-  //     ],
-  //     buttons: [
-  //       {
-  //         text: 'Cancelar',
-  //         role: 'cancel',
-  //       },
-  //       {
-  //         text: 'Salvar',
-  //         handler: (data) => {
-  //           const produtoAtualizado: Produto = {
-  //             id_produto: produto.id_produto,
-  //             nome_produto: data.nome_produto,
-  //             nome_classificacao: produto.nome_classificacao,
-  //             preco: produto.preco
-  //           };
-  //           this.updateProduto(produtoAtualizado);
-  //         },
-  //       },
-  //     ],
-  //   });
+  async openEditAlert(produto: Produto) {
+    const alert = await this.alertController.create({
+      header: 'Editar Produto',
+      inputs: [
+        {
+          name: 'nome_produto',
+          type: 'text',
+          placeholder: 'Nome do Produto',
+          value: produto.nome_produto,
+        },
+        ...(produto.usa_tamanho
+          ? [
+            {
+              name: 'descricao',
+              type: 'textarea' as const,
+              placeholder: 'Descrição do Produto',
+              value: produto.descricao || '', 
+            },
+          ]
+          : []),
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+        },
+        {
+          text: 'Salvar',
+          handler: (data) => {
+            const produtoAtualizado: UpdateRequest = {
+              id_produto: produto.id_produto,
+              nome_produto: data.nome_produto,
+              descricao: produto.usa_tamanho ? data.descricao : null,
+              usa_tamanho: produto.usa_tamanho,
+            };
 
-  //   await alert.present();
-  // }
+            console.log('Produto Atualizado:', produtoAtualizado);
 
-  updateProduto(produto: Produto) {
-    this.produtoService.updateProduto(produto).subscribe(() => {
-      this.getProdutos();
+            this.updateProduto(produtoAtualizado);
+          },
+        },
+      ],
+    });
+
+    await alert.present();
+  }
+
+  updateProduto(produto: UpdateRequest) {
+    if (!produto.id_produto) {
+      console.error('ID do produto é inválido ou não foi fornecido.');
+      return;
+    }
+
+
+    this.produtoService.updateProduto(produto).subscribe({
+      next: (res) => {
+        this.getProdutos();
+      },
+      error: (err) => {
+        console.error('Erro ao atualizar produto', err);
+      },
     });
   }
 

@@ -33,10 +33,10 @@
                   </ion-card-subtitle>
 
                   <div class="action-icons">
-                    <ion-button fill="solid" size="small" color="warning">
+                    <ion-button fill="solid" size="small" color="warning" (click)="openEditAlert(produto)">
                       <ion-icon slot="icon-only" name="pencil"></ion-icon>
                     </ion-button>
-                    <ion-button fill="solid" size="small" color="danger">
+                    <ion-button fill="solid" size="small" color="danger" (click)="openDeleteAlert(produto)">
                       <ion-icon slot="icon-only" name="close"></ion-icon>
                     </ion-button>
                   </div>
