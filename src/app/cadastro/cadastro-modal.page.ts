@@ -1,46 +1,68 @@
 import { Component } from '@angular/core';
-import { ModalController, IonicModule } from '@ionic/angular';
-import { FormsModule } from '@angular/forms'; 
-import { HttpClient } from '@angular/common/http';
-import { PratoService } from '../services/prato/prato.service';
-import { Prato } from '../services/prato/prato.model';
+import { ProdutoService } from '../services/produto/produto.service';
+import { Classificacao, ProdutoRequest } from '../services/produto/produto.model';
+import { ModalController } from '@ionic/angular';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
 
 @Component({
   selector: 'app-cadastro-modal',
   templateUrl: './cadastro-modal.page.html',
   styleUrls: ['./cadastro-modal.page.scss'],
   standalone: true,
-  imports: [IonicModule, FormsModule]
+  imports: [
+    CommonModule,
+    FormsModule,
+    IonicModule
+  ]
 })
 export class CadastroModalPage {
-    nome: string = '';  
-    descricao: string = '';  
-    valor: number = 0;  
+  classificacaoSelecionada: Classificacao | null = null;
+  nome_produto: string = '';
+  descricao: string | null = '';
+  usaTamanho: boolean = false;
+  valorUnico: number | undefined = undefined;
+  classificacoes: Classificacao[] = [];
 
   constructor(
-    private modalController: ModalController,
-    private pratoService: PratoService
-  ) {}
+    private produtoService: ProdutoService,
+    private modalController: ModalController
+  ) { }
+
+  ngOnInit() {
+    this.produtoService.getClassificacoes().subscribe((classificacoes: Classificacao[]) => {
+      this.classificacoes = classificacoes;
+    });
+  }
+
+  selecionarClassificacao(classificacao: Classificacao | null) {
+    if (classificacao) {
+      this.classificacaoSelecionada = classificacao;
+      this.usaTamanho = classificacao.usa_tamanho;
+      if (!this.usaTamanho) {
+        this.descricao = null;
+      }
+    }
+  }
 
   dismiss() {
     this.modalController.dismiss();
   }
 
-  addPrato() {
-    const newPrato = {
-      nome: this.nome,
-      descricao: this.descricao,
-      valor: this.valor
+  addProduto() {
+    const payload = {
+      id_produto: 0 as number,
+      nome_produto: this.nome_produto,
+      descricao: this.usaTamanho ? this.descricao : null,
+      id_classificacao: this.classificacaoSelecionada ? this.classificacaoSelecionada.id_classificacao : 0,
+      usa_tamanho: this.usaTamanho,
+      ...(this.usaTamanho ? {} : { preco: this.valorUnico })
     };
 
-    this.pratoService.addPrato(newPrato).subscribe({
-      next: (response) => {
-        console.log('Prato adicionado com sucesso:', response);
-        this.modalController.dismiss(response);
-      },
-      error: (error) => {
-        console.error('Erro ao salvar prato:', error);
-      }
+    this.produtoService.addProduto(payload).subscribe({
+      next: res => this.modalController.dismiss(res),
+      error: err => console.error('Erro ao salvar produto', err)
     });
   }
 }

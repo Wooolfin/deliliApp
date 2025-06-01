@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Cadastro de Prato</ion-title>
+    <ion-title>Cadastro de Produto</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="dismiss()">Fechar</ion-button>
     </ion-buttons>
@@ -8,26 +8,40 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <form (ngSubmit)="addPrato()">
-    <ion-item>
-      <ion-label position="floating">Nome</ion-label>
-      <ion-input [(ngModel)]="nome" name="nome" type="text" required></ion-input>
-    </ion-item>
-  
-    <ion-item>
-      <ion-label position="floating">Descrição</ion-label>
-      <ion-textarea [(ngModel)]="descricao" name="descricao" rows="3" required></ion-textarea>
-    </ion-item>
-  
-    <ion-item>
-      <ion-label position="floating">Valor</ion-label>
-      <ion-input [(ngModel)]="valor" name="valor" type="number" required></ion-input>
-    </ion-item>
-  
-    <ion-footer class="ion-padding">
-      <ion-button expand="block" type="submit" color="primary">Salvar</ion-button>
-      <ion-button expand="block" fill="clear" (click)="dismiss()">Cancelar</ion-button>
-    </ion-footer>
+  <ion-item>
+    <ion-select label="Classificação" label-placement="stacked" [(ngModel)]="classificacaoSelecionada"
+      name="classificacaoSelecionada" (ionChange)="selecionarClassificacao(classificacaoSelecionada)" required>
+      <ion-select-option *ngFor="let classificacao of classificacoes" [value]="classificacao">
+        {{ classificacao.nome_classificacao }}
+      </ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <form (ngSubmit)="addProduto()" #produtoForm="ngForm">
+    <div *ngIf="classificacaoSelecionada">
+      <ion-item>
+        <ion-label position="floating">Nome do Produto</ion-label>
+        <ion-input [(ngModel)]="nome_produto" name="nome_produto" required></ion-input>
+      </ion-item>
+
+      <ion-item *ngIf="usaTamanho">
+        <ion-label position="floating">Descrição</ion-label>
+        <ion-textarea [(ngModel)]="descricao" name="descricao" rows="3" required></ion-textarea>
+      </ion-item>
+
+      <ion-item *ngIf="!usaTamanho">
+        <ion-label position="floating">Valor</ion-label>
+        <ion-input [(ngModel)]="valorUnico" name="valorUnico" type="number" required></ion-input>
+      </ion-item>
+
+      <ion-footer class="ion-padding">
+        <ion-button expand="block" type="submit" [disabled]="produtoForm.invalid" color="primary">
+          Salvar Produto
+        </ion-button>
+        <ion-button expand="block" fill="clear" (click)="dismiss()">
+          Cancelar
+        </ion-button>
+      </ion-footer>
+    </div>
   </form>
-  
 </ion-content>
