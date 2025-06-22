@@ -1,0 +1,78 @@
+<ion-content class="ion-padding">
+  <ng-container *ngFor="let grupo of produtosAgrupados">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ grupo.classificacao }}</ion-card-title>
+        <ion-card-subtitle *ngIf="grupo.usaTamanho">
+          <ng-container *ngFor="let preco of grupo.produtos[0]?.classificacao_preco; let i = index">
+            <span>
+              {{ preco.descricao_tamanho }}: R$ {{ preco.preco | number:'1.2-2' }}
+            </span>
+            <span *ngIf="i < (grupo.produtos[0]?.classificacao_preco?.length || 0) - 1"> | </span>
+          </ng-container>
+        </ion-card-subtitle>
+
+
+      </ion-card-header>
+
+
+      <ion-list>
+        <ion-item *ngFor="let produto of grupo.produtos" (click)="abrirQuantidade(produto)">
+          <ion-label>
+            <h2>{{ produto.nome_produto }}</h2>
+            <p>{{ produto.descricao }}</p>
+            <h3 *ngIf="produto.preco_unico !== null">R$ {{ produto.preco_unico | number:'1.2-2' }}</h3>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-card>
+  </ng-container>
+
+  <ion-fab vertical="bottom" horizontal="center" slot="fixed">
+    <ion-fab-button (click)="abrirSacola()" class="finalizar-btn">
+      Finalizar Pedido
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>
+
+<ion-modal [isOpen]="modalAberto" (didDismiss)="modalAberto = false">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Sacola</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="modalAberto = false">Fechar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding">
+      <ion-list>
+        <ion-item *ngFor="let item of itensSacola; let i = index">
+          <ion-label>
+            <h2>{{ item.nome_produto }}</h2>
+            <p>Quantidade: {{ item.quantidade }}</p>
+            <p>Subtotal: {{ item.preco * item.quantidade | number: '1.2-2' }}</p>
+          </ion-label>
+          <ion-buttons slot="end">
+            <ion-button (click)="editarItem(i)">
+              <ion-icon name="pencil-outline"></ion-icon>
+            </ion-button>
+            <ion-button color="danger" (click)="removerItem(i)">
+              <ion-icon name="trash-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-item>
+
+      </ion-list>
+      <ion-item lines="full">
+        <ion-label><strong>Total:</strong></ion-label>
+        <ion-note slot="end">{{ calcularTotal() }}</ion-note>
+      </ion-item>
+
+      <ion-button expand="block" color="success" (click)="finalizarPedido()">
+        Confirmar Pedido
+      </ion-button>
+    </ion-content>
+  </ng-template>
+</ion-modal>
