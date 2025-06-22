@@ -3,7 +3,11 @@ from database import get_connection
 def get_sacolas():
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT s.pedido_id,p.nome AS nome_produto,s.quantidade,s.subtotal FROM sacola s JOIN produto p ON s.produto_id = p.id;")
+    cursor.execute('''
+                   SELECT s.pedido_id, p.nome_produto, s.quantidade, s.subtotal
+        FROM sacola s
+        JOIN produto p ON s.produto_id = p.id_produto
+                   ''')
     sacolas = cursor.fetchall()
     conn.close()
     return sacolas
@@ -30,14 +34,20 @@ def add_sacola(itens):
     for item in itens:
         produto_id = item.get("produto_id")
         quantidade = item.get("quantidade")
+        id_classificacao_preco = item.get("id_classificacao_preco")
+        id_produto_preco = item.get("id_produto_preco")
+        id_tamanho = item.get("id_tamanho")
 
         if not produto_id or not quantidade:
             continue
 
         cursor.execute("""
-            INSERT INTO sacola (pedido_id, produto_id, quantidade)
-            VALUES (%s, %s, %s)
-        """, (pedido_id, produto_id, quantidade))
+            INSERT INTO sacola (
+                pedido_id, produto_id, quantidade,
+                id_classificacao_preco, id_produto_preco
+            ) VALUES (%s, %s, %s, %s, %s)
+        """, (pedido_id, produto_id, quantidade,
+            id_classificacao_preco, id_produto_preco))
 
     conn.commit()
     conn.close()
