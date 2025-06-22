@@ -1,14 +1,17 @@
 from fastapi import APIRouter, Form, Path
 from services.sacola_service import get_sacolas, add_sacola
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 
 router = APIRouter()
 
 class ItemSacola(BaseModel):
-    pedido_id: int
+    pedido_id: Optional[int]
     produto_id: int
     quantidade: int
+    id_classificacao_preco: Optional[int] = None
+    id_produto_preco: Optional[int] = None
+    id_tamanho: Optional[int] = None
 
 @router.get("/get_sacolas")
 def list_sacolas():

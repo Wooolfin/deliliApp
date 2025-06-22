@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Pedido } from '../pedido/pedido.model';
-import { ItemSacola } from '../pedido/item-sacola.model';
-import { firstValueFrom } from 'rxjs';
+import { Pedido, Produto } from '../pedido/pedido.model';
+import { ItemSacolaRequest } from '../pedido/item-sacola.model';
+import { firstValueFrom, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -11,20 +11,16 @@ export class PedidoService {
   private apiUrl = 'http://localhost:8000';
 
   constructor(private http: HttpClient) {}
-
-  async addPedido(
-    pedido: Pedido
-  ): Promise<{ pedido_id: number; status: string }> {
-    return await firstValueFrom(
-      this.http.post<{ pedido_id: number; status: string }>(
-        `${this.apiUrl}/add_pedido`,
-        pedido
-      )
-    );
+  
+  getProdutos(): Observable<Produto[]> {
+    return this.http.get<Produto[]>(`${this.apiUrl}/get_produtos_pedido`);
   }
-  async addItemSacola(item: ItemSacola): Promise<any> {
-    return await firstValueFrom(
-      this.http.post<any>(`${this.apiUrl}/add_sacola`, [item])
-    );
+  
+  addPedido(pedido: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/add_pedido`, pedido);
+  }
+  
+  addItemSacola(itens: ItemSacolaRequest[]): Observable<any> {
+    return this.http.post(`${this.apiUrl}/add_sacola`, itens);
   }
 }
