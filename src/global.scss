@@ -35,3 +35,90 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+@import url('https://fonts.googleapis.com/css2?family=Akaya+Telivigala&display=swap');
+
+.material-symbols-rounded {
+  font-family: 'Material Symbols Rounded' !important;
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 800,
+    'GRAD' 0,
+    'opsz' 48;
+  font-size: 2rem;
+  display: inline-block;
+  line-height: 1;
+}
+
+ion-card-title {
+  font-size: 3em;
+  font-weight: bold;
+}
+
+ion-card-title, ion-title {
+  font-family: 'akaya telivigala', sans-serif;
+  color: #FFB91B;
+}
+
+ion-card {
+  border-radius: 1rem;
+  padding: 0rem 1rem 2rem 1rem;
+  margin: 2rem 1rem;
+}
+
+ion-padding {
+  border-radius: 2rem !important;
+  padding: 0;
+}
+ion-alert.custom-alert .alert-cancel-btn {
+  display: flex;
+  font-size: 0 !important;
+  color: #f24c58!important;
+}
+
+ion-alert.custom-alert .alert-cancel-btn::before {
+  content: 'close';
+  font-family: 'Material Symbols Rounded';
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+  font-size: 1.5rem;
+  display: inline-block;
+}
+
+ion-alert.custom-alert .alert-confirm-btn {
+  font-family: 'akaya telivigala', sans-serif;
+  color: #FFB91B!important;
+  font-weight: 800;
+  font-size: 1rem;
+  border-radius: 1rem;
+}
+
+ion-radio {
+  --color-checked: #FFB91B;
+}
+
+
+ion-item ion-buttons ion-button span.material-symbols-rounded {
+  font-size: 1.3rem; 
+  line-height: 1;
+}
+
+ion-list {
+  border-radius: 0.6rem 0.6rem 0 0 ;
+}
+
+ion-row {
+  flex-wrap: wrap;
+}
+
+ion-col {
+  display: flex;
+  flex-direction: column;
+}
+
+scroll-y {
+  padding: 0 !important;
+}

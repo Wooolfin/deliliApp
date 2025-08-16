@@ -1,0 +1,35 @@
+.quantity-control {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1rem 0;
+}
+
+.quantity-control span {
+  margin: 0 1rem;
+  font-size: 1.2rem;
+}
+
+ion-label {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+:host {
+  --color-checked: #FFB91B;
+}
+
+.footer-container {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  
+}
+.quantity-control {
+  display: flex;
+  align-items: center;
+  margin-right: 1rem;
+}
+.footer-container ion-button:last-child {
+  flex: 1;
+}

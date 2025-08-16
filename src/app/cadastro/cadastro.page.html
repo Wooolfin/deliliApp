@@ -5,18 +5,12 @@
 </ion-header>
 
 <ion-content>
-
   <div class="filter-scroll">
-    <ion-chip *ngFor="let classificacao of classificacoes"
-      [color]="classificacaoSelecionada === classificacao.nome ? 'primary' : 'medium'"
-      (click)="selecionarClassificacao(classificacao.nome)">
-      <ion-label>
-        <ion-icon *ngIf="classificacao.id == 1" name="restaurant-outline"></ion-icon>
-        <ion-icon *ngIf="classificacao.id == 2" name="color-fill-outline"></ion-icon>
-        <ion-icon *ngIf="classificacao.id == 3" name="beer-outline"></ion-icon>
-      </ion-label>
-    </ion-chip>
+    <ion-button class="filter-btn" *ngFor="let classificacao of classificacoes" shape="round" [color]="classificacaoSelecionada === classificacao.nome ? 'primary' : 'medium'" (click)="selecionarClassificacao(classificacao.nome)">
+    <span class="material-symbols-rounded">star</span>
+    </ion-button>
   </div>
+
 
 
   <ion-grid>
@@ -33,12 +27,11 @@
                   </ion-card-subtitle>
 
                   <div class="action-icons">
-                    <ion-button fill="solid" size="small" color="warning" (click)="openEditAlert(produto)">
-                      <ion-icon slot="icon-only" name="pencil"></ion-icon>
+                    <ion-button (click)="openEditAlert(produto)" color="warning">
+                      <span class="material-symbols-rounded">edit</span>
                     </ion-button>
-                    <ion-button fill="solid" size="small" color="danger" (click)="openDeleteAlert(produto)">
-                      <ion-icon slot="icon-only" name="close"></ion-icon>
-                    </ion-button>
+                    <ion-button (click)="openDeleteAlert(produto)" color="danger"><span
+                        class="material-symbols-rounded">close</span></ion-button>
                   </div>
                 </ion-card-header>
 

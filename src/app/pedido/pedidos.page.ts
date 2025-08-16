@@ -4,6 +4,8 @@ import { Produto } from '../services/pedido/pedido.model';
 import { PedidoService } from '../services/pedido/pedido.service';
 import { ItemSacola, ItemSacolaRequest } from '../services/pedido/item-sacola.model';
 import { CommonModule } from '@angular/common';
+import { SelectQuantidadeModalComponent } from '../pedido/select-quantidade-modal/select-quantidade-modal.component'
+
 
 @Component({
   selector: 'app-home',
@@ -19,14 +21,29 @@ export class PedidosPage implements OnInit {
   itensSacolaRequest: ItemSacolaRequest[] = [];
   modalAberto = false;
 
+  classificacaoSelecionada: string | null = null;
+
   constructor(
     private alertController: AlertController,
-    private modalController: ModalController,
-    private pedidoService: PedidoService
+    private pedidoService: PedidoService,
+    private modalCtrl: ModalController,
+
   ) { }
 
   ngOnInit() {
     this.carregarProdutos();
+  }
+
+  selecionarClassificacao(cat: string | null) {
+    this.classificacaoSelecionada = cat;
+  }
+
+  get itemCount(): number {
+    return this.itensSacola.length;
+  }
+
+  get valorTotal(): number {
+    return this.itensSacola.reduce((acc, item) => acc + item.preco * item.quantidade, 0)
   }
 
   carregarProdutos() {
@@ -62,54 +79,19 @@ export class PedidosPage implements OnInit {
   }
 
   async abrirQuantidade(produto: Produto) {
-    const inputs: any[] = this.createInputs(produto);
-
-    const alert = await this.alertController.create({
-      header: `Selecionar tamanho e quantidade`,
-      inputs,
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-        },
-        {
-          text: 'Confirmar',
-          handler: (data) => this.handleConfirmar(data, produto),
-        }
-      ]
-    });
-
-    await alert.present();
-  }
-
-  createInputs(produto: Produto) {
-    const inputs: any[] = [];
-
-    if (produto.usa_tamanho && produto.classificacao_preco?.length) {
-      inputs.push({
-        type: 'select',
-        name: 'tamanho',
-        label: 'Tamanho',
-        value: '0',
-        options: produto.classificacao_preco.map((t, index) => ({
-          text: `${t.descricao_tamanho} - R$ ${t.preco.toFixed(2)}`,
-          value: index.toString()
-        }))
-      });
+    const modal = await this.modalCtrl.create({
+      component: SelectQuantidadeModalComponent,
+      componentProps: { produto }
+    })
+    await modal.present()
+    const { data } = await modal.onDidDismiss()
+    if (data) {
+      const { quantidade, tamanhoIndex, deliveryNotes } = data
+      this.handleConfirmar({ quantidade: quantidade.toString(), tamanho: tamanhoIndex.toString() }, produto, deliveryNotes)
     }
-
-    inputs.push({
-      name: 'quantidade',
-      type: 'number',
-      min: 1,
-      value: 1,
-      placeholder: 'Quantidade'
-    });
-
-    return inputs;
   }
 
-  handleConfirmar(data: any, produto: Produto) {
+  handleConfirmar(data: any, produto: Produto, deliveryNotes?: string) {
     const quantidade = parseInt(data.quantidade, 10);
     if (quantidade > 0) {
       let preco = produto.preco_unico ?? 0;
@@ -147,7 +129,8 @@ export class PedidosPage implements OnInit {
     const item = this.itensSacola[index];
     this.alertController
       .create({
-        header: `Editar quantidade de ${item.nome_produto}`,
+        header: `Quantidade de ${item.nome_produto}`,
+        cssClass: 'custom-alert',
         inputs: [
           {
             name: 'quantidade',
@@ -157,12 +140,10 @@ export class PedidosPage implements OnInit {
           },
         ],
         buttons: [
-          {
-            text: 'Cancelar',
-            role: 'cancel',
-          },
+          { text: '', role: 'cancel', cssClass: 'alert-cancel-btn' },
           {
             text: 'Atualizar',
+            cssClass: 'alert-confirm-btn',
             handler: (data) => {
               const novaQtd = parseInt(data.quantidade, 10);
               if (novaQtd > 0) {
@@ -187,30 +168,17 @@ export class PedidosPage implements OnInit {
     this.alertController
       .create({
         header: 'Informações do Cliente',
+        cssClass: 'custom-alert',
         inputs: [
-          {
-            name: 'cliente',
-            type: 'text',
-            placeholder: 'Nome do Cliente',
-          },
-          {
-            name: 'telefone',
-            type: 'tel',
-            placeholder: 'Telefone',
-          },
-          {
-            name: 'endereco',
-            type: 'text',
-            placeholder: 'Endereço',
-          },
+          { name: 'cliente', type: 'text', placeholder: 'Nome do Cliente' },
+          { name: 'telefone', type: 'tel', placeholder: 'Telefone' },
+          { name: 'endereco', type: 'text', placeholder: 'Endereço' }
         ],
         buttons: [
-          {
-            text: 'Cancelar',
-            role: 'cancel',
-          },
+          { text: '', role: 'cancel', cssClass: 'alert-cancel-btn' },
           {
             text: 'Confirmar',
+            cssClass: 'alert-confirm-btn',
             handler: (data) => {
               const pedido = {
                 cliente: data.cliente,

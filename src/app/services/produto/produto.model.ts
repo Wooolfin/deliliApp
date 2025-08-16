@@ -5,6 +5,7 @@ export interface Tamanho {
 }
 
 export interface Produto {
+  categoria: string;
   id_produto: number;
   nome_produto: string;
   descricao?: string | null;
