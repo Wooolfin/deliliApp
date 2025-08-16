@@ -1,38 +1,155 @@
 <ion-content class="ion-padding">
-  <ng-container *ngFor="let grupo of produtosAgrupados">
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>{{ grupo.classificacao }}</ion-card-title>
-        <ion-card-subtitle *ngIf="grupo.usaTamanho">
-          <ng-container *ngFor="let preco of grupo.produtos[0]?.classificacao_preco; let i = index">
-            <span>
-              {{ preco.descricao_tamanho }}: R$ {{ preco.preco | number:'1.2-2' }}
-            </span>
-            <span *ngIf="i < (grupo.produtos[0]?.classificacao_preco?.length || 0) - 1"> | </span>
+  <div class="filter-scroll-lg filtro-sticky ion-hide-md-down">
+    <ion-chip (click)="selecionarClassificacao(null)" color="light">
+      Todas
+    </ion-chip>
+    <ion-chip *ngFor="let grupo of produtosAgrupados" (click)="selecionarClassificacao(grupo.classificacao)"
+      [color]="classificacaoSelecionada === grupo.classificacao ? 'primary' : 'medium'">
+      {{ grupo.classificacao }}
+    </ion-chip>
+  </div>
+  <div class="filter-scroll-sm filtro-sticky ion-hide-md-up">
+    <ion-chip (click)="selecionarClassificacao(null)" color="light">
+      Todas
+    </ion-chip>
+
+    <div style="width: max-content;" *ngFor="let grupo of produtosAgrupados"
+      (click)="selecionarClassificacao(grupo.classificacao)">
+      {{ grupo.classificacao }}
+    </div>
+  </div>
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12" size-lg="8">
+        <ion-row class="ion-align-items-stretch">
+          <ng-container *ngFor="let grupo of produtosAgrupados">
+            <ng-container *ngIf="!classificacaoSelecionada || classificacaoSelecionada === grupo.classificacao">
+              <ion-col size="12" class="ion-align-self-stretch">
+                <ion-card class="produto-card">
+                  <ion-card-header>
+                    <div>
+                      <ion-card-title>{{ grupo.classificacao }}</ion-card-title>
+                    </div>
+                    <div>
+                      <ion-card-subtitle *ngIf="grupo.usaTamanho">
+                        <ng-container *ngFor="let preco of grupo.produtos[0]?.classificacao_preco; let i = index">
+                          <span>
+                            {{ preco.descricao_tamanho }}: R$ {{ preco.preco | number:'1.2-2' }}
+                          </span>
+                          <span *ngIf="i < (grupo.produtos[0]?.classificacao_preco?.length || 0) - 1"> | </span>
+                        </ng-container>
+                      </ion-card-subtitle>
+                    </div>
+                    </ion-card-header>
+                    <ion-grid>
+                      <ion-row>
+                        <!-- Coluna da esquerda (índices pares) -->
+                        <ion-col size="6">
+                          <ion-list>
+                            <ng-container *ngFor="
+                      let produto of grupo.produtos;
+                      let idx = index
+                    ">
+                              <ion-item *ngIf="idx % 2 === 0" (click)="abrirQuantidade(produto)">
+                                <ion-label>
+                                  <h2><strong>{{ produto.nome_produto }}</strong></h2>
+                                  <p><small>{{ produto.descricao }}</small></p>
+                                  <h3 *ngIf="produto.preco_unico !== null">
+                                    R$ {{ produto.preco_unico | number: '1.2-2' }}
+                                  </h3>
+                                </ion-label>
+                              </ion-item>
+                            </ng-container>
+                          </ion-list>
+                        </ion-col>
+
+                        <!-- Coluna da direita (índices ímpares) -->
+                        <ion-col size="6">
+                          <ion-list>
+                            <ng-container *ngFor="
+                      let produto of grupo.produtos;
+                      let idx = index
+                    ">
+                              <ion-item *ngIf="idx % 2 === 1" (click)="abrirQuantidade(produto)">
+                                <ion-label>
+                                  <h2><strong>{{ produto.nome_produto }}</strong></h2>
+                                  <p><small>{{ produto.descricao }}</small></p>
+                                  <h3 *ngIf="produto.preco_unico !== null">
+                                    R$ {{ produto.preco_unico | number: '1.2-2' }}
+                                  </h3>
+                                </ion-label>
+                              </ion-item>
+                            </ng-container>
+                          </ion-list>
+                        </ion-col>
+                      </ion-row>
+                    </ion-grid>
+
+                </ion-card>
+              </ion-col>
+            </ng-container>
           </ng-container>
-        </ion-card-subtitle>
+        </ion-row>
+
+      </ion-col>
 
 
-      </ion-card-header>
+      <ion-col size="12" size-lg="4" class="ion-hide-lg-down">
+        <ion-card class="ion-padding sacola-sticky">
+          <ion-header>
+            <ion-toolbar>
+              <ion-title>Sacola</ion-title>
+            </ion-toolbar>
+          </ion-header>
 
+          <div class="ion-padding" style="overflow-y: auto; max-height: 80vh;">
+            <ion-list>
+              <ion-item *ngFor="let item of itensSacola; let i = index">
+                <ion-label>
+                  <h2>
+                    {{ item.selectedTamanho
+                    ? (item.nome_produto + ' - ' + item.selectedTamanho.descricao_tamanho)
+                    : item.nome_produto }}
+                  </h2>
+                  <p>Quantidade: {{ item.quantidade }}</p>
+                </ion-label>
+                <p>R$ {{ item.preco * item.quantidade | number: '1.2-2' }}</p>
+                <ion-buttons slot="end">
+                  <ion-button (click)="editarItem(i)">
+                    <span class="material-symbols-rounded">edit</span>
+                  </ion-button>
+                  <ion-button color="danger" (click)="removerItem(i)">
+                    <span class="material-symbols-rounded">delete</span>
+                  </ion-button>
+                </ion-buttons>
+              </ion-item>
+            </ion-list>
 
-      <ion-list>
-        <ion-item *ngFor="let produto of grupo.produtos" (click)="abrirQuantidade(produto)">
-          <ion-label>
-            <h2>{{ produto.nome_produto }}</h2>
-            <p>{{ produto.descricao }}</p>
-            <h3 *ngIf="produto.preco_unico !== null">R$ {{ produto.preco_unico | number:'1.2-2' }}</h3>
-          </ion-label>
-        </ion-item>
-      </ion-list>
-    </ion-card>
-  </ng-container>
+            <ion-item lines="full">
+              <h4><strong>Total:</strong></h4>
+              <h4 slot="end">R$ {{ calcularTotal() | number: '1.2-2' }}</h4>
+            </ion-item>
 
-  <ion-fab vertical="bottom" horizontal="center" slot="fixed">
+            <ion-button expand="block" (click)="finalizarPedido()" class="confirmar-pedido-btn">
+              <div id="confirmar-pedido-btn">
+                <h4><strong>Confirmar Pedido</strong></h4>
+              </div>
+            </ion-button>
+          </div>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <ion-fab vertical="bottom" horizontal="center" slot="fixed" class="ion-hide-lg-up">
     <ion-fab-button (click)="abrirSacola()" class="finalizar-btn">
-      Finalizar Pedido
+      <div id="sacola-info">
+        <h4><strong>{{ itemCount }}</strong> Itens</h4>
+        <h4>Total: R$ {{ calcularTotal() | number:'1.2-2' }}</h4>
+      </div>
     </ion-fab-button>
   </ion-fab>
+
 </ion-content>
 
 <ion-modal [isOpen]="modalAberto" (didDismiss)="modalAberto = false">
@@ -41,7 +158,9 @@
       <ion-toolbar>
         <ion-title>Sacola</ion-title>
         <ion-buttons slot="end">
-          <ion-button (click)="modalAberto = false">Fechar</ion-button>
+          <ion-button (click)="modalAberto = false" color="danger">
+            <span class="material-symbols-rounded">close</span>
+          </ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
@@ -50,28 +169,32 @@
       <ion-list>
         <ion-item *ngFor="let item of itensSacola; let i = index">
           <ion-label>
-            <h2>{{ item.nome_produto }}</h2>
+            <h2>
+              {{ item.selectedTamanho
+              ? (item.nome_produto + ' - ' + item.selectedTamanho.descricao_tamanho)
+              : item.nome_produto }}
+            </h2>
             <p>Quantidade: {{ item.quantidade }}</p>
-            <p>Subtotal: {{ item.preco * item.quantidade | number: '1.2-2' }}</p>
           </ion-label>
+          <p>R$ {{ item.preco * item.quantidade | number: '1.2-2' }}</p>
           <ion-buttons slot="end">
             <ion-button (click)="editarItem(i)">
-              <ion-icon name="pencil-outline"></ion-icon>
+              <span class="material-symbols-rounded">edit</span>
             </ion-button>
             <ion-button color="danger" (click)="removerItem(i)">
-              <ion-icon name="trash-outline"></ion-icon>
+              <span class="material-symbols-rounded">delete</span>
             </ion-button>
           </ion-buttons>
         </ion-item>
-
       </ion-list>
       <ion-item lines="full">
-        <ion-label><strong>Total:</strong></ion-label>
-        <ion-note slot="end">{{ calcularTotal() }}</ion-note>
+        <h4><strong>Total:</strong></h4>
+        <h4 slot="end">R$ {{ calcularTotal() | number: '1.2-2' }}</h4>
       </ion-item>
-
-      <ion-button expand="block" color="success" (click)="finalizarPedido()">
-        Confirmar Pedido
+      <ion-button expand="block" (click)="finalizarPedido()" class="confirmar-pedido-btn">
+        <div id="confirmar-pedido-btn">
+          <h4><strong>Confirmar Pedido</strong></h4>
+        </div>
       </ion-button>
     </ion-content>
   </ng-template>

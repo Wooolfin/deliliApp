@@ -1,0 +1,52 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ produto.nome_produto }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="close()" color="danger">
+        <span class="material-symbols-rounded">close</span>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ng-container *ngIf="produto.usa_tamanho">
+    <ion-list>
+      <ion-list-header>
+        <ion-label>Observação</ion-label>
+      </ion-list-header>
+      <ion-item>
+        <ion-textarea [(ngModel)]="deliveryNotes" placeholder="Alteração"></ion-textarea>
+      </ion-item>
+    </ion-list>
+
+    <ion-list>
+      <ion-radio-group [(ngModel)]="tamanhoIndex">
+        <ion-list-header>
+          <ion-label>Escolha o tamanho</ion-label>
+        </ion-list-header>
+        <ion-item *ngFor="let opc of produto.classificacao_preco; let i = index">
+          <ion-label>{{ opc.descricao_tamanho }} – R$ {{ opc.preco | number:'1.2-2' }}</ion-label>
+          <ion-radio slot="start" [value]="i"></ion-radio>
+        </ion-item>
+      </ion-radio-group>
+    </ion-list>
+  </ng-container>
+
+  <ion-footer>
+    <div class="footer-container">
+      <div class="quantity-control">
+        <ion-button fill="clear" color="warning" (click)="decrement()">
+          <span class="material-symbols-rounded">remove</span>
+        </ion-button>
+        <span>{{ quantidade }}</span>
+        <ion-button fill="clear" color="warning" (click)="increment()">
+          <span class="material-symbols-rounded">add</span>
+        </ion-button>
+      </div>
+      <ion-button expand="block" color="warning" (click)="addToCart()">
+        Adicionar
+      </ion-button>
+    </div>
+  </ion-footer>
+</ion-content>

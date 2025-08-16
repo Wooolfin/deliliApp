@@ -1,13 +1,15 @@
 .filter-scroll {
   display: flex;
-  overflow-x: auto;
-  gap: 10px;
-  padding: 10px;
+  gap: 1rem;
   justify-content: center;
 }
 
-ion-icon {
-  font-size: 2.5em;
+.filter-btn{
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .product-card {
@@ -30,3 +32,8 @@ ion-icon {
 .size-line {
   margin: 0.25rem 0;
 }
+
+ion-button {
+  --border-radius: 1rem;
+}
+
